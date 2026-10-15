@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Báo Cáo Quý 03/2026 – Hoa Sen Holdings Group</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root {
+    --primary: #8B100A;
+    --primary-dark: #5c0a06;
+    --accent: #FFE000;
+    --accent-dark: #c9a800;
+    --bg: #f5f3ef;
+    --card: #ffffff;
+    --text: #2c3e50;
+    --muted: #6c757d;
+    --border: #e7e2d8;
+    --green: #2e7d32;
+    --red: #c62828;
+    --blue: #1565c0;
+    --orange: #e65100;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+
+  .topbar {
+    background: linear-gradient(120deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: #fff; padding: 28px 40px; position: relative; overflow: hidden;
+  }
+  .topbar::after {
+    content: ""; position: absolute; right: -60px; top: -60px;
+    width: 220px; height: 220px; border-radius: 50%; background: rgba(255,224,0,0.12);
+  }
+  .topbar .tag {
+    display: inline-block; background: var(--accent); color: var(--primary-dark);
+    font-weight: 700; font-size: 12px; letter-spacing: .08em; padding: 4px 10px;
+    border-radius: 4px; margin-bottom: 10px;
+  }
+  .topbar h1 { margin: 0; font-size: 24px; font-weight: 700; }
+  .topbar p  { margin: 6px 0 0; color: #f2d9d7; font-size: 13.5px; }
+
+  .container { max-width: 1200px; margin: 24px auto; padding: 0 20px 60px; }
+
+  /* KPI grid */
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .kpi {
+    background: var(--card); border: 1px solid var(--border); border-left: 5px solid var(--primary);
+    border-radius: 10px; padding: 14px 16px; box-shadow: 0 2px 6px rgba(0,0,0,.04);
+  }
+  .kpi .label { font-size: 11.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  .kpi .value { font-size: 20px; font-weight: 700; margin-top: 4px; color: var(--primary-dark); }
+  .kpi .sub   { font-size: 12px; margin-top: 4px; }
+  .up   { color: var(--green); }
+  .down { color: var(--red); }
+  .warn { color: var(--orange); }
+
+  /* Section */
+  .section {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 20px 22px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,.03);
+  }
+  .section h2 {
+    margin: 0 0 8px; font-size: 16px; color: var(--primary-dark);
+    border-left: 4px solid var(--accent); padding-left: 10px;
+  }
+  .insight-box {
+    background: #fbf4e8; border-left: 3px solid var(--accent-dark);
+    padding: 9px 13px; border-radius: 6px; font-size: 13px; color: #333; margin-bottom: 14px;
+  }
+  .insight-box b { color: var(--primary-dark); }
+
+  .chart-wrap { position: relative; height: 300px; width: 100%; }
+  .chart-wrap-sm { position: relative; height: 240px; width: 100%; }
+
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 18px; margin-bottom: 20px; }
+
+  /* Award table */
+  .award-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .award-table th {
+    background: var(--primary); color: #fff; padding: 8px 10px;
+    text-align: left; font-weight: 600; border: 1px solid var(--primary-dark);
+  }
+  .award-table th:not(:first-child) { text-align: center; }
+  .award-table td { padding: 7px 10px; border: 1px solid var(--border); vertical-align: top; line-height: 1.4; }
+  .award-table tr:nth-child(even) td { background: #faf8f4; }
+  .award-table .miss { color: var(--red); font-weight: 600; }
+  .award-table .ok   { color: var(--green); }
+  .award-table .warn { color: var(--orange); }
+
+  /* CN gạch badge */
+  .gach-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-top: 12px; }
+  .gach-card {
+    background: #faf8f4; border: 1px solid var(--border); border-radius: 8px;
+    padding: 10px 12px; text-align: center;
+  }
+  .gach-card .cn-name { font-size: 12px; color: var(--muted); font-weight: 600; text-transform: uppercase; }
+  .gach-card .cn-val  { font-size: 18px; font-weight: 700; margin: 4px 0; color: var(--primary-dark); }
+  .gach-card .cn-bar  { height: 6px; border-radius: 3px; background: #e7e2d8; overflow: hidden; margin-top: 4px; }
+  .gach-card .cn-fill { height: 100%; border-radius: 3px; }
+
+  @media(max-width: 820px) { .grid-2 { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="tag">HOA SEN HOLDINGS GROUP – KIỂM SOÁT VÙNG 2</div>
+  <h1>BÁO CÁO PHÂN TÍCH Q3/2026 – T07 · T08 · T09</h1>
+  <p>Kết quả thực hiện kế hoạch HTPP · Số liệu đối chiếu T09 cập nhật ngày 15/10/2026</p>
+</div>
+
+<div class="container">
+
+  <!-- ===== KPI TỔNG HỢP Q3 ===== -->
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="label">SL TT Tổng Q3</div>
+      <div class="value">16.053 tấn</div>
+      <div class="sub warn">T07: 5.574t → T08: 5.756t → T09: 4.723t ▼ -17,9% T09</div>
+    </div>
+    <div class="kpi">
+      <div class="label">DT TM Tổng Q3</div>
+      <div class="value">55,9 tỷ đ</div>
+      <div class="sub down">T07: 22,6t → T08: 18,7t → T09: 14,7t ▼ -21,5% T09</div>
+    </div>
+    <div class="kpi">
+      <div class="label">TLHT TT – T09</div>
+      <div class="value" style="color:var(--red)">61,7%</div>
+      <div class="sub down">▼ Giảm mạnh từ 112,4% (T08) · Chỉ 21/68 CH vượt KH</div>
+    </div>
+    <div class="kpi">
+      <div class="label">TLHT TM – T09</div>
+      <div class="value warn" style="color:var(--orange)">73,7%</div>
+      <div class="sub down">▼ Giảm từ 76,9% (T08) · Đồng Tháp giữ vững 98,9%</div>
+    </div>
+    <div class="kpi">
+      <div class="label">Gạch Tổng Q3 (T09)</div>
+      <div class="value">125.618 m²</div>
+      <div class="sub warn">BQ/CH: 1.847 m² · Ngưỡng CNT: 2.500 m² ▼ Không CN nào đạt</div>
+    </div>
+    <div class="kpi">
+      <div class="label">NV đủ điều kiện SPTT</div>
+      <div class="value">9 / 238</div>
+      <div class="sub warn">≥1,5x: 3 NV · 1,0–1,5x: 6 NV · &lt;1,0x: 229 NV (96,2%)</div>
+    </div>
+  </div>
+
+  <!-- ===== CHART 1: Q3 OVERVIEW ===== -->
+  <div class="section">
+    <h2>1. Tỷ lệ hoàn thành kế hoạch toàn Vùng 2 — Q3/2026 (T07 → T08 → T09)</h2>
+    <div class="insight-box">
+      <b>Insight:</b> TLHT TT bứt phá đỉnh điểm T08 (112,4%) rồi sụt mạnh về 61,7% trong T09 — mức thấp nhất quý — do KH điều chỉnh tăng trong khi thực tế sản lượng giảm 17,9%. TLHT TM duy trì xu hướng giảm liên tiếp 3 tháng (87,9% → 76,9% → 73,7%), phản ánh sức mua VLXD yếu kéo dài suốt Q3.
+    </div>
+    <div class="chart-wrap"><canvas id="chartOverall"></canvas></div>
+  </div>
+
+  <!-- ===== CHART 2 + 3 ===== -->
+  <div class="grid-2">
+    <div class="section">
+      <h2>2. TLHT theo Chi nhánh — T09/2026</h2>
+      <div class="insight-box">
+        <b>Insight:</b> Đồng Tháp dẫn đầu TM (98,9%) nhờ chuỗi cửa hàng khu vực đô thị mạnh; Cà Mau dẫn đầu TT (97,0%) nhưng lại yếu nhất TM (66,1%). Tiền Giang kém nhất cả hai mặt (TT 56,7% – TM 54,8%), cần can thiệp ưu tiên trong Q4.
+      </div>
+      <div class="chart-wrap"><canvas id="chartCN"></canvas></div>
+    </div>
+
+    <div class="section">
+      <h2>3. Tăng trưởng MoM — T09 so với T08 (%)</h2>
+      <div class="insight-box">
+        <b>Insight:</b> T09 ghi nhận mức giảm kép: SL TT -17,9% và DT TM -21,5% so với T08 — mức sụt lớn nhất trong Q3. Bán Cán đạt 1.184 tấn thực, trong khi SL Gạch 125.618 m² vẫn không đủ để mở khóa giải thưởng CNT (ngưỡng BQ 2.500 m²/CH).
+      </div>
+      <div class="chart-wrap"><canvas id="chartMoM"></canvas></div>
+    </div>
+  </div>
+
+  <!-- ===== CHART 4: PHÂN BỔ CH ===== -->
+  <div class="section">
+    <h2>4. Phân bổ số Cửa hàng theo mức TLHT KH — Q3/2026</h2>
+    <div class="insight-box">
+      <b>Insight:</b> Xu hướng TT đảo chiều rõ rệt: số CH vượt KH tăng vọt từ 22→42 trong T08 rồi rơi xuống chỉ 21 trong T09, trong khi CH dưới 70% tăng từ 6 lên 26. Hàng TM ngày càng phân hóa — số CH dưới 70% tăng liên tục: 27→36→37 CH qua 3 tháng, chỉ có 6 CH đạt vượt KH TM trong T09.
+    </div>
+    <div class="chart-wrap"><canvas id="chartDist"></canvas></div>
+  </div>
+
+  <!-- ===== CHART 5: GẠCH THEO CN ===== -->
+  <div class="section">
+    <h2>5. Sản lượng gạch BQ/Cửa hàng theo Chi nhánh — T09 vs Ngưỡng CNT (2.500 m²)</h2>
+    <div class="insight-box">
+      <b>Insight:</b> <b>Không có Chi nhánh nào đạt ngưỡng BQ 2.500 m²/CH</b> để đủ điều kiện giải thưởng Chi nhánh Tỉnh. Đồng Tháp gần nhất (2.348 m²/CH, thiếu 152 m²), trong khi Tiền Giang xa nhất (1.362 m²/CH, chỉ đạt 54% ngưỡng). Toàn Vùng 2 chỉ có 1 Nhân viên có SL gạch ≥1.500 m² (Hà Trần Mai – Cao Lãnh 3: 1.719 m²).
+    </div>
+    <div class="chart-wrap-sm"><canvas id="chartGach"></canvas></div>
+
+    <div class="gach-grid" style="margin-top:18px">
+      <div class="gach-card">
+        <div class="cn-name">Bến Tre</div>
+        <div class="cn-val" style="color:var(--red)">1.565 m²</div>
+        <div class="cn-bar"><div class="cn-fill" style="width:62.6%;background:var(--red)"></div></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px">12 CH · 62,6% ngưỡng</div>
+      </div>
+      <div class="gach-card">
+        <div class="cn-name">Cà Mau</div>
+        <div class="cn-val" style="color:var(--orange)">1.830 m²</div>
+        <div class="cn-bar"><div class="cn-fill" style="width:73.2%;background:var(--orange)"></div></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px">13 CH · 73,2% ngưỡng</div>
+      </div>
+      <div class="gach-card">
+        <div class="cn-name">Sóc Trăng</div>
+        <div class="cn-val" style="color:var(--orange)">2.008 m²</div>
+        <div class="cn-bar"><div class="cn-fill" style="width:80.3%;background:var(--orange)"></div></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px">15 CH · 80,3% ngưỡng</div>
+      </div>
+      <div class="gach-card">
+        <div class="cn-name">Tiền Giang</div>
+        <div class="cn-val" style="color:var(--red)">1.362 m²</div>
+        <div class="cn-bar"><div class="cn-fill" style="width:54.5%;background:var(--red)"></div></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px">13 CH · 54,5% ngưỡng</div>
+      </div>
+      <div class="gach-card">
+        <div class="cn-name">Đồng Tháp</div>
+        <div class="cn-val" style="color:#c9a800">2.348 m²</div>
+        <div class="cn-bar"><div class="cn-fill" style="width:93.9%;background:#c9a800"></div></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px">15 CH · Gần nhất (93,9%)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CHART 6: NV TLHT PHÂN TẦNG ===== -->
+  <div class="grid-2">
+    <div class="section">
+      <h2>6. Phân tầng TLHT SPTT Nhân viên — T09</h2>
+      <div class="insight-box">
+        <b>Insight:</b> 96,2% Nhân viên (229/238) không đạt KH SPTT trong T09. Chỉ 9 NV đạt ≥100% KH TT với SL ≥7 tấn — điều kiện để xét <b>NV Giải 2 (SPTT)</b>: 4 tỉnh có NV đủ điều kiện (BT:1, CM:2, ST:3, ĐT:3), riêng <b>Tiền Giang 0 NV</b> đủ điều kiện bất kỳ giải NV nào.
+      </div>
+      <div class="chart-wrap-sm"><canvas id="chartNV"></canvas></div>
+    </div>
+
+  </div>
+
+</div><!-- /container -->
+
+<script>
+  const maroon     = '#8B100A';
+  const maroonMid  = '#c0342c';
+  const maroonLite = '#e0605a';
+  const gold       = '#c9a800';
+  const goldLite   = '#f3d651';
+  const green      = '#2e7d32';
+  const red        = '#c62828';
+  const orange     = '#e65100';
+  const blue       = '#1565c0';
+  const blueLite   = '#4fc3f7';
+
+  Chart.defaults.font.family = "'Segoe UI', Arial, sans-serif";
+  Chart.defaults.color = '#334155';
+
+  // ==== CHART 1: Q3 OVERVIEW ====
+  new Chart(document.getElementById('chartOverall'), {
+    type: 'bar',
+    data: {
+      labels: ['Tháng 07', 'Tháng 08', 'Tháng 09'],
+      datasets: [
+        {
+          label: 'TLHT TT (%)',
+          data: [88.0, 112.4, 61.7],
+          backgroundColor: [maroon, maroon, red],
+          borderRadius: 6, maxBarThickness: 60
+        },
+        {
+          label: 'TLHT TM (%)',
+          data: [87.9, 76.9, 73.7],
+          backgroundColor: [gold, gold, '#e0b800'],
+          borderRadius: 6, maxBarThickness: 60
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom' },
+        tooltip: {
+          callbacks: {
+            afterLabel: ctx => {
+              const vals = [[88.0,87.9],[112.4,76.9],[61.7,73.7]];
+              return ctx.datasetIndex === 0
+                ? `KH đặt ra: ~${[100,88,100][ctx.dataIndex]}%`
+                : '';
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true, max: 130,
+          title: { display: true, text: '% Hoàn thành KH' },
+          ticks: { callback: v => v + '%' }
+        }
+      }
+    }
+  });
+
+  // ==== CHART 2: CN T09 ====
+  new Chart(document.getElementById('chartCN'), {
+    type: 'bar',
+    data: {
+      labels: ['Bến Tre', 'Cà Mau', 'Sóc Trăng', 'Tiền Giang', 'Đồng Tháp'],
+      datasets: [
+        {
+          label: 'TLHT TT T09 (%)',
+          data: [52.8, 97.0, 58.8, 56.7, 60.8],
+          backgroundColor: maroon, borderRadius: 4
+        },
+        {
+          label: 'TLHT TM T09 (%)',
+          data: [76.9, 66.1, 70.6, 54.8, 98.9],
+          backgroundColor: gold, borderRadius: 4
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom' } },
+      scales: {
+        y: {
+          beginAtZero: true, max: 120,
+          title: { display: true, text: '%' },
+          ticks: { callback: v => v + '%' }
+        }
+      }
+    }
+  });
+
+  // ==== CHART 3: MoM T09 vs T08 ====
+  new Chart(document.getElementById('chartMoM'), {
+    type: 'bar',
+    data: {
+      labels: ['SL TT Toàn HT', 'DT TM (sau trừ)', 'Gạch (m²)', 'Bán Cán'],
+      datasets: [{
+        label: '% Tăng/Giảm T09 so T08',
+        data: [-17.9, -21.5, null, null],
+        backgroundColor: ctx => ctx.raw < 0 ? red : green,
+        borderRadius: 5
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false },
+        tooltip: { callbacks: { label: ctx => `${ctx.raw > 0 ? '+' : ''}${ctx.raw?.toFixed(1) ?? 'N/A'}%` } }
+      },
+      scales: {
+        y: { title: { display: true, text: '% MoM' }, ticks: { callback: v => v + '%' } }
+      }
+    }
+  });
+
+  // ==== CHART 4: PHÂN BỔ CH ====
+  new Chart(document.getElementById('chartDist'), {
+    type: 'bar',
+    data: {
+      labels: ['TT – T07', 'TT – T08', 'TT – T09', 'TM – T07', 'TM – T08', 'TM – T09'],
+      datasets: [
+        { label: '≥100% KH',     data: [22, 42, 21, 23, 15, 6],  backgroundColor: green,  borderRadius: 4 },
+        { label: '70–99% KH',    data: [30, 23, 21, 21, 20, 17], backgroundColor: gold,   borderRadius: 4 },
+        { label: 'Dưới 70% KH', data: [19,  6, 26, 27, 36, 37], backgroundColor: red,    borderRadius: 4 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom' } },
+      scales: {
+        x: { stacked: true },
+        y: { stacked: true, beginAtZero: true, title: { display: true, text: 'Số cửa hàng' } }
+      }
+    }
+  });
+
+  // ==== CHART 5: GẠCH BQ THEO CN ====
+  new Chart(document.getElementById('chartGach'), {
+    type: 'bar',
+    data: {
+      labels: ['Bến Tre', 'Cà Mau', 'Sóc Trăng', 'Tiền Giang', 'Đồng Tháp', 'Ngưỡng CNT'],
+      datasets: [{
+        label: 'SLBQ Gạch/CH (m²)',
+        data: [1565, 1830, 2008, 1362, 2348, 2500],
+        backgroundColor: ['#c62828','#e65100','#e65100','#c62828','#c9a800','rgba(46,125,50,0.25)'],
+        borderColor: [red, orange, orange, red, gold, green],
+        borderWidth: [0,0,0,0,0,2],
+        borderRadius: 4
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false },
+        tooltip: { callbacks: { label: ctx => `${ctx.raw.toLocaleString('vi-VN')} m²` } }
+      },
+      scales: {
+        y: { beginAtZero: false, min: 1000, max: 2700,
+             title: { display: true, text: 'm²/CH' },
+             ticks: { callback: v => v.toLocaleString('vi-VN') } }
+      }
+    }
+  });
+
+  // ==== CHART 6: NV PHÂN TẦNG ====
+  new Chart(document.getElementById('chartNV'), {
+    type: 'doughnut',
+    data: {
+      labels: ['< 1,0x KH (229 NV)', '1,0–1,5x (6 NV)', '1,5–2,0x (2 NV)', '≥ 2,0x (1 NV)'],
+      datasets: [{
+        data: [229, 6, 2, 1],
+        backgroundColor: [red, gold, orange, green],
+        borderWidth: 2, borderColor: '#fff'
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'right', labels: { font: { size: 12 } } },
+        tooltip: { callbacks: { label: ctx => `${ctx.label}: ${ctx.raw} NV (${(ctx.raw/238*100).toFixed(1)}%)` } }
+      }
+    }
+  });
+</script>
+</body>
+</html>
